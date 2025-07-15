@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testservice-stage-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: testservice
+  template:
+    metadata:
+      labels:
+        app: testservice
+    spec:
+      containers:
+      - name: testservice
+        image: REPLACE_IMAGE
+        imagePullPolicy: Always
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: REPLACE_ENV
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        - name: TZ
+          value: "Asia/Taipei"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "500Mi"
+          limits:
+            cpu: "500m"
+            memory: "1024Mi"
+        ports:
+        - containerPort: 8080
