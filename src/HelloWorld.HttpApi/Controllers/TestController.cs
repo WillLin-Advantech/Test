@@ -9,7 +9,7 @@ namespace HelloWorld.Controllers;
 public class TestController : AbpController
 {
     [HttpGet]
-	[PermissionAuthorize("test")]
+	//[PermissionAuthorize("test")]
 	public string Hello(){
 		
 		return "hello";
