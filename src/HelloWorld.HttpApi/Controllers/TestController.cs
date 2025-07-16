@@ -5,7 +5,7 @@ using JWTAuthorizeLibrary;
 
 namespace HelloWorld.Controllers;
 
-[Route("api/hello")]
+[Route("api/testService")]
 public class TestController : AbpController
 {
     [HttpGet]
