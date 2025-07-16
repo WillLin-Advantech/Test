@@ -46,41 +46,30 @@ namespace HelloWorld;
 )]
 public class HelloWorldHttpApiHostModule : AbpModule
 {
-    public override void PreConfigureServices(ServiceConfigurationContext context)
-    {
-        PreConfigure<OpenIddictBuilder>(builder =>
-        {
-            builder.AddValidation(options =>
-            {
-                options.AddAudiences("HelloWorld");
-                options.UseLocalServer();
-                options.UseAspNetCore();
-            });
-        });
-    }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
-        ConfigureAuthentication(context);
+        ConfigureAuthentication(context, configuration);
         ConfigureBundles();
         ConfigureUrls(configuration);
         ConfigureConventionalControllers();
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
-        context.Services.AddCustomJwtAuthentication(configuration);
+       
     }
 
-    private void ConfigureAuthentication(ServiceConfigurationContext context)
+    private void ConfigureAuthentication(ServiceConfigurationContext context, IConfiguration configuration)
     {
         context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
         context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
         {
             options.IsDynamicClaimsEnabled = true;
         });
+        context.Services.AddCustomJwtAuthentication(configuration);
     }
 
     private void ConfigureBundles()
