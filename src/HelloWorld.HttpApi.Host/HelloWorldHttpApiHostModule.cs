@@ -29,6 +29,7 @@ using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using JWTAuthorizeLibrary;
 
 namespace HelloWorld;
 
@@ -70,6 +71,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
+        context.Services.AddCustomJwtAuthentication(configuration);
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)

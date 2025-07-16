@@ -1,6 +1,7 @@
 ﻿using HelloWorld.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc;
+using JWTAuthorizeLibrary;
 
 namespace HelloWorld.Controllers;
 
@@ -8,6 +9,7 @@ namespace HelloWorld.Controllers;
 public class TestController : AbpController
 {
     [HttpGet]
+	[PermissionAuthorize("test")]
 	public string Hello(){
 		
 		return "hello";
