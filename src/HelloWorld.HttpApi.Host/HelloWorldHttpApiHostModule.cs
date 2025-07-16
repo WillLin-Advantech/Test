@@ -184,7 +184,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
         }
 
         app.UseCorrelationId();
-        //app.UseStaticFiles();
+        app.UseStaticFiles();
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
