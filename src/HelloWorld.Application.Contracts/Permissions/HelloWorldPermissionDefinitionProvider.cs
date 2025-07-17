@@ -11,6 +11,9 @@ public class HelloWorldPermissionDefinitionProvider : PermissionDefinitionProvid
         var myGroup = context.AddGroup(HelloWorldPermissions.GroupName);
         //Define your own permissions here. Example:
         //myGroup.AddPermission(HelloWorldPermissions.MyPermission1, L("Permission:MyPermission1"));
+        var parentRequest = myGroup.AddPermission(HelloWorldPermissions.ParentRequest);
+        parentRequest.AddChild(HelloWorldPermissions.RequestRead);
+        parentRequest.AddChild(HelloWorldPermissions.RequestManager);
     }
 
     private static LocalizableString L(string name)
