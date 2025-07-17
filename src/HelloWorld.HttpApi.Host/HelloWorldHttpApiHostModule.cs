@@ -197,10 +197,19 @@ public class HelloWorldHttpApiHostModule : AbpModule
         app.UseDynamicClaims();
         app.UseAuthorization();
 
+        app.Use(async (context, next) =>
+        {
+            if (context.Request.Path.StartsWithSegments("/testService/swagger/v1/swagger.json"))
+            {
+                context.Response.Redirect("/swagger/v1/swagger.json", true);
+                return;
+            }
+            await next();
+        });
         app.UseSwagger();
         app.UseAbpSwaggerUI(c =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "HelloWorld API");
+            c.SwaggerEndpoint("/testService/swagger/v1/swagger.json", "HelloWorld API");
 
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
