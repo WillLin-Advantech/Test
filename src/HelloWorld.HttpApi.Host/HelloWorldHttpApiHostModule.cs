@@ -2,6 +2,7 @@ using HelloWorld.EntityFrameworkCore;
 using HelloWorld.InfraStructure;
 using HelloWorld.MultiTenancy;
 using JWTAuthorizeLibrary;
+using JWTAuthorizeLibrary.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
@@ -178,7 +179,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
     {
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
-
+        app.UseMiddleware<BearerTokenMiddleware>();
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
