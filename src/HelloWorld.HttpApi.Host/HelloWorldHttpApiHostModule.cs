@@ -238,7 +238,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
     {
         using var scope = context.ServiceProvider.CreateScope();
         var permissionDefinitionManager = scope.ServiceProvider.GetRequiredService<IPermissionDefinitionManager>();
-        var permissionGroups = (await permissionDefinitionManager.GetGroupsAsync()).Where(group => group.Name == "WarehouseRequest");
+        var permissionGroups = (await permissionDefinitionManager.GetGroupsAsync()).Where(group => group.Name == "HelloWorld");
         var permissionList = new List<PermissionDefinitionRecord>();
         foreach (var group in permissionGroups)
         {
