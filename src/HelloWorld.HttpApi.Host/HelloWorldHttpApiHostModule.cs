@@ -1,4 +1,5 @@
 using HelloWorld.EntityFrameworkCore;
+using HelloWorld.InfraStructure;
 using HelloWorld.MultiTenancy;
 using JWTAuthorizeLibrary;
 using Microsoft.AspNetCore.Builder;
@@ -48,7 +49,8 @@ namespace HelloWorld;
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(HelloWorldInfraStructureModule)
 )]
 public class HelloWorldHttpApiHostModule : AbpModule
 {
@@ -57,7 +59,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-
+        context.Services.AddHttpClient();
         ConfigureAuthentication(context, configuration);
         ConfigureBundles();
         ConfigureUrls(configuration);
@@ -184,7 +186,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
 
         app.UseAbpRequestLocalization();
 
-        if (!env.IsDevelopment())
+        if (env.IsDevelopment())
         {
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             Task.Run(async () => await SyncPermissionToSecondAPI(context, configuration));
@@ -268,14 +270,22 @@ public class HelloWorldHttpApiHostModule : AbpModule
                 permissionList.Add(parentParamterModel);
             }
         }
-        var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
-        var httpClient = httpClientFactory.CreateClient();
+        try
+        {
+            var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
 
-        var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
-        var cont = JsonSerializer.Serialize(permissionList);
-        var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
-        var response = await httpClient.PostAsync(url, jsonContent);
-        response.EnsureSuccessStatusCode();
+            var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
+            var cont = JsonSerializer.Serialize(permissionList);
+            var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(url, jsonContent);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+            throw;
+        }
     }
 
     #endregion --Private
