@@ -6,4 +6,8 @@ public static class HelloWorldPermissions
 
     //Add your own permission names. Example:
     //public const string MyPermission1 = GroupName + ".MyPermission1";
+    public const string Default = GroupName;
+    public const string ParentRequest = Default + ".Request";
+    public const string RequestRead = ParentRequest + ".Read";
+    public const string RequestManager = ParentRequest + ".Manager";
 }

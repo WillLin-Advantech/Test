@@ -1,35 +1,41 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using HelloWorld.EntityFrameworkCore;
+using HelloWorld.MultiTenancy;
+using JWTAuthorizeLibrary;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using HelloWorld.EntityFrameworkCore;
-using HelloWorld.MultiTenancy;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Autofac;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
+using Volo.Abp.PermissionManagement;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
-using JWTAuthorizeLibrary;
 
 namespace HelloWorld;
 
@@ -180,6 +186,8 @@ public class HelloWorldHttpApiHostModule : AbpModule
 
         if (!env.IsDevelopment())
         {
+            var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
+            Task.Run(async () => await SyncPermissionToSecondAPI(context, configuration));
             app.UseErrorPage();
         }
 
@@ -220,4 +228,55 @@ public class HelloWorldHttpApiHostModule : AbpModule
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
     }
+
+    #region --Private
+
+    /// <summary>
+    /// Sync權限給驗證的API
+    /// </summary>
+    private async Task SyncPermissionToSecondAPI(ApplicationInitializationContext context, IConfiguration configuration)
+    {
+        using var scope = context.ServiceProvider.CreateScope();
+        var permissionDefinitionManager = scope.ServiceProvider.GetRequiredService<IPermissionDefinitionManager>();
+        var permissionGroups = (await permissionDefinitionManager.GetGroupsAsync()).Where(group => group.Name == "WarehouseRequest");
+        var permissionList = new List<PermissionDefinitionRecord>();
+        foreach (var group in permissionGroups)
+        {
+            foreach (var permission in group.Permissions)
+            {
+                foreach (var childPermission in permission.Children)
+                {
+                    var childParamterModel = new PermissionDefinitionRecord
+                    {
+                        Name = childPermission.Name,
+                        ParentName = permission.Name,
+                        DisplayName = childPermission.DisplayName.Localize(null!),
+                        IsEnabled = childPermission.IsEnabled,
+                        GroupName = group.Name,
+                        MultiTenancySide = childPermission.MultiTenancySide
+                    };
+                    permissionList.Add(childParamterModel);
+                }
+                var parentParamterModel = new PermissionDefinitionRecord
+                {
+                    Name = permission.Name,
+                    DisplayName = permission.DisplayName.Localize(null!),
+                    IsEnabled = permission.IsEnabled,
+                    GroupName = group.Name,
+                    MultiTenancySide = permission.MultiTenancySide
+                };
+                permissionList.Add(parentParamterModel);
+            }
+        }
+        var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
+        var httpClient = httpClientFactory.CreateClient();
+
+        var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
+        var cont = JsonSerializer.Serialize(permissionList);
+        var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
+        var response = await httpClient.PostAsync(url, jsonContent);
+        response.EnsureSuccessStatusCode();
+    }
+
+    #endregion --Private
 }
