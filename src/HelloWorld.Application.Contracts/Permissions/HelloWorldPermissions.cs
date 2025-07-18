@@ -12,4 +12,9 @@ public static class HelloWorldPermissions
     public const string RequestManager = ParentRequest + ".Manager";
     public const string TestManager = ParentRequest + ".Test";
     public const string DeleteManager = ParentRequest + ".Delete";
+
+    public const string GroupName2 = "Test";
+    public const string Default2 = GroupName2;
+    public const string ParentRequest2 = Default2 + ".Request";
+    public const string RequestRead2 = ParentRequest2 + ".Read";
 }
