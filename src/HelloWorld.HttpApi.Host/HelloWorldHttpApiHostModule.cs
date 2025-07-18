@@ -1,3 +1,4 @@
+using ElasticSearchLog;
 using HelloWorld.EntityFrameworkCore;
 using HelloWorld.InfraStructure;
 using HelloWorld.MultiTenancy;
@@ -63,6 +64,8 @@ public class HelloWorldHttpApiHostModule : AbpModule
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
         context.Services.AddHttpClient();
+
+        context.Services.ConfigureElasticSearch(configuration);
         ConfigureAuthentication(context, configuration);
         ConfigureBundles();
         ConfigureUrls(configuration);
@@ -278,11 +281,12 @@ public class HelloWorldHttpApiHostModule : AbpModule
             var httpClient = httpClientFactory.CreateClient("AgsApi");
 
             var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
+            throw new UserFriendlyException($"Insert failed.{url}");
             var cont = JsonSerializer.Serialize(permissionList);
             var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync(url, jsonContent);
             response.EnsureSuccessStatusCode();
-            throw new UserFriendlyException($"Insert failed.{url}");
+            
         }
         catch (Exception ex)
         {
