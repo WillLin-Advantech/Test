@@ -6,6 +6,7 @@ using JWTAuthorizeLibrary.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -60,7 +61,10 @@ public class HelloWorldHttpApiHostModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-        context.Services.AddHttpClient();
+        context.Services.AddHttpClient("AgsApi", client =>
+        {
+            client.BaseAddress = new Uri(configuration["Url:AgsApiGateway"]);
+        });
         ConfigureAuthentication(context, configuration);
         ConfigureBundles();
         ConfigureUrls(configuration);
@@ -274,12 +278,12 @@ public class HelloWorldHttpApiHostModule : AbpModule
         try
         {
             var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = httpClientFactory.CreateClient("AgsApi");
 
             var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
             var cont = JsonSerializer.Serialize(permissionList);
             var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync(url, jsonContent);
+            var response = await httpClient.PostAsync("/api/app/authorization/permission", jsonContent);
             response.EnsureSuccessStatusCode();
         }
         catch (Exception ex)
