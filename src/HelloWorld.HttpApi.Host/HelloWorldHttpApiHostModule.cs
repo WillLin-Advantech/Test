@@ -271,14 +271,21 @@ public class HelloWorldHttpApiHostModule : AbpModule
                 permissionList.Add(parentParamterModel);
             }
         }
-        var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
-        var httpClient = httpClientFactory.CreateClient();
+        try
+        {
+            var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
 
-        var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
-        var cont = JsonSerializer.Serialize(permissionList);
-        var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
-        var response = await httpClient.PostAsync(url, jsonContent);
-        response.EnsureSuccessStatusCode(); 
+            var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
+            var cont = JsonSerializer.Serialize(permissionList);
+            var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(url, jsonContent);
+            response.EnsureSuccessStatusCode();
+        }catch(Exception ex)
+        {
+            Console.WriteLine($"Error syncing permissions: {ex.Message}");
+            // Handle the exception as needed, e.g., log it or rethrow
+        }   
     }
 
     #endregion --Private
