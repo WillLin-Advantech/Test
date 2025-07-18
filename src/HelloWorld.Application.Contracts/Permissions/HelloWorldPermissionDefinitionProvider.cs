@@ -27,7 +27,7 @@ public class HelloWorldPermissionDefinitionProvider : PermissionDefinitionProvid
         parentRequest2.AddChild(HelloWorldPermissions.TargetManager2);
 
         var myGrou3 = context.AddGroup(HelloWorldPermissions.GroupName3);
-        var parentRequest3 = myGroup2.AddPermission(HelloWorldPermissions.ParentRequest3);
+        var parentRequest3 = myGrou3.AddPermission(HelloWorldPermissions.ParentRequest3);
         parentRequest3.AddChild(HelloWorldPermissions.RequestRead3);
         parentRequest3.AddChild(HelloWorldPermissions.RequestManager3);
         parentRequest3.AddChild(HelloWorldPermissions.TestManager3);
