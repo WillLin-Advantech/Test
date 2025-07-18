@@ -12,4 +12,5 @@ public static class HelloWorldPermissions
     public const string RequestManager = ParentRequest + ".Manager";
     public const string TestManager = ParentRequest + ".Test";
     public const string TestManager2 = ParentRequest + ".Test2";
+    public const string TestManager3 = ParentRequest + ".Test3";
 }

@@ -97,6 +97,8 @@ pipeline {
                 container('kubectl') {
 					script {
 						sh """
+							kubectl delete -f ${WORKSPACE}/service.yaml
+							kubectl delete -f ${WORKSPACE}/deployment.yaml
 							sed -i -e "s|REPLACE_IMAGE|${latestName}|g" -e "s|REPLACE_ENV|${composeEnv}|g" ${WORKSPACE}/deployment.yaml
 							kubectl apply -f ${WORKSPACE}/service.yaml
 							kubectl apply -f ${WORKSPACE}/deployment.yaml
