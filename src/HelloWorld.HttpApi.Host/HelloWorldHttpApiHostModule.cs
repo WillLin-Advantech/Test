@@ -187,12 +187,12 @@ public class HelloWorldHttpApiHostModule : AbpModule
 
         app.UseAbpRequestLocalization();
 
-        if (!env.IsDevelopment())
-        {
+        //if (env.IsDevelopment())
+        //{
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             Task.Run(async () => await SyncPermissionToSecondAPI(context, configuration));
             app.UseErrorPage();
-        }
+        //}
 
         app.UseCorrelationId();
         app.UseStaticFiles();
