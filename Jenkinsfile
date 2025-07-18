@@ -108,15 +108,6 @@ pipeline {
             }
         }
 		
-		stage('Deploy to Linux VM') {
-			agent {
-				label GetAgent()
-			}
-            steps {
-                script {
-					sh "IMAGE_NAME=${latestName} ASPNETCORE_ENVIRONMENT=${composeEnv} docker compose -f 'docker-compose.yml' -p ags-apigateways up -d --remove-orphans"
-				}
-            }
-        }
+
     }
 }
