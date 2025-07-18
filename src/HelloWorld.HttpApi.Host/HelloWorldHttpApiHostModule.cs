@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -61,10 +62,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-        context.Services.AddHttpClient("AgsApi", client =>
-        {
-            client.BaseAddress = new Uri(configuration["Url:AgsApiGateway"]);
-        });
+        context.Services.AddHttpClient();
         ConfigureAuthentication(context, configuration);
         ConfigureBundles();
         ConfigureUrls(configuration);
@@ -283,12 +281,14 @@ public class HelloWorldHttpApiHostModule : AbpModule
             var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
             var cont = JsonSerializer.Serialize(permissionList);
             var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync("/api/app/authorization/permission", jsonContent);
+            var response = await httpClient.PostAsync(url, jsonContent);
             response.EnsureSuccessStatusCode();
+            throw new UserFriendlyException($"Insert failed.{url}");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception: {ex.Message}");
+            throw new UserFriendlyException($"Insert failed.{ex.Message}");
             throw;
         }
     }
