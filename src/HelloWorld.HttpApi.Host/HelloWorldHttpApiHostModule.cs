@@ -187,7 +187,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
 
         app.UseAbpRequestLocalization();
 
-        if (env.IsDevelopment())
+        if (!env.IsDevelopment())
         {
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             Task.Run(async () => await SyncPermissionToSecondAPI(context, configuration));
@@ -281,12 +281,11 @@ public class HelloWorldHttpApiHostModule : AbpModule
             var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync(url, jsonContent);
             response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
+        }catch(Exception ex)
         {
-            Console.WriteLine($"Exception: {ex.Message}");
-            throw;
-        }
+            Console.WriteLine($"Error syncing permissions: {ex.Message}");
+            // Handle the exception as needed, e.g., log it or rethrow
+        }   
     }
 
     #endregion --Private
