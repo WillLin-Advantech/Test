@@ -10,7 +10,7 @@ namespace HelloWorld.Controllers;
 public class TestController : AbpController
 {
     [HttpGet]
-	[PermissionAuthorize(HelloWorldPermissions.RequestManager)]
+	[PermissionAuthorize(HelloWorldPermissions.RequestManager2)]
 	public string Hello(){
 		
 		return "hello";
