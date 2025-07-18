@@ -278,7 +278,7 @@ public class HelloWorldHttpApiHostModule : AbpModule
         try
         {
             var httpClientFactory = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>();
-            var httpClient = httpClientFactory.CreateClient("AgsApi");
+            var httpClient = httpClientFactory.CreateClient();
 
             var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
             throw new UserFriendlyException($"Insert failed.{url}");
