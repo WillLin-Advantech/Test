@@ -16,6 +16,7 @@ public class HelloWorldPermissionDefinitionProvider : PermissionDefinitionProvid
         parentRequest.AddChild(HelloWorldPermissions.RequestManager);
         parentRequest.AddChild(HelloWorldPermissions.TestManager);
         parentRequest.AddChild(HelloWorldPermissions.TargetManager);
+        parentRequest.AddChild(HelloWorldPermissions.WriteManager);
     }
 
     private static LocalizableString L(string name)
