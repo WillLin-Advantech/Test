@@ -281,7 +281,6 @@ public class HelloWorldHttpApiHostModule : AbpModule
             var httpClient = httpClientFactory.CreateClient();
 
             var url = $"{configuration["Url:AgsApiGateway"]}/api/app/authorization/permission";
-            throw new UserFriendlyException($"Insert failed.{url}");
             var cont = JsonSerializer.Serialize(permissionList);
             var jsonContent = new StringContent(JsonSerializer.Serialize(permissionList), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync(url, jsonContent);
